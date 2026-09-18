@@ -1,0 +1,19 @@
+-- AlterTable
+ALTER TABLE "Dimension" ALTER COLUMN "width" SET DATA TYPE DOUBLE PRECISION;
+
+-- CreateTable
+CREATE TABLE "Lab_result" (
+    "id" SERIAL NOT NULL,
+    "code" TEXT NOT NULL,
+    "Tensile" INTEGER NOT NULL,
+    "Yield" INTEGER NOT NULL,
+    "Elongation" DOUBLE PRECISION NOT NULL,
+    "Coating_mass" DOUBLE PRECISION NOT NULL,
+    "BMT" DOUBLE PRECISION NOT NULL,
+    "TCT" DOUBLE PRECISION NOT NULL,
+    "Width" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Lab_result_pkey" PRIMARY KEY ("id")
+);
