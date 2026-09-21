@@ -11,6 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url = env("DATABASE_URL")
 }
 
 model User {
@@ -107,4 +108,12 @@ enum Product_type {
 enum Coating_type {
   Al_Zn
   Zn
+}
+
+enum Product_status {
+  Prime
+  Medium
+  Second
+  Downgrade
+  Hold
 }
