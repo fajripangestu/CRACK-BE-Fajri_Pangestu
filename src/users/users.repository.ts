@@ -1,14 +1,19 @@
 import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class UsersRepository{
-    //constructor(private readonly prisma: PrismaService){}
+    constructor(private readonly prisma: PrismaService){}
 
     getAllUsers(){
-        return 'This is users from repository'
+        return this.prisma.user.findMany();
     }
 
     getOneUserById(id: number){
-        return `This is user ${id} from repository`;
+        return this.prisma.user.findUnique(
+            {
+                where: {id: id}
+            }
+        );
     }
 }
