@@ -97,6 +97,7 @@ model Product_name {
   updatedAt  DateTime @updatedAt
   createdBy  String
   updatedBy  String
+  ordered    Boolean
 }
 
 enum Product_type {
@@ -115,4 +116,14 @@ enum Product_status {
   Second
   Downgrade
   Hold
+}
+
+model example {
+  id Int @id @default(autoincrement())
+  name String
+}
+
+model example2 {
+  id Int @id @default(autoincrement())
+  name String
 }
