@@ -16,11 +16,9 @@ import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
 import { MaterialLocationsModule } from './material-locations/material-locations.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule, AuthModule],
+  imports: [ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule],
   controllers: [AppController],
   providers: [AppService],
 })
