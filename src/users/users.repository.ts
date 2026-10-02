@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Role } from "generated/prisma/enums";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -34,10 +35,15 @@ export class UsersRepository{
         );
     }
     
-    updateRole(id: number, role: string) {
+    async updateRole(id: number, role: string) {
+        const validRoles = Object.values(Role); // ['USER','ADMIN','SUPERADMIN']
+        if (!validRoles.includes(role as Role)) {
+            throw new Error(`Invalid role: ${role}`);
+        }
+
         return this.prisma.user.update({
             where: { id },
-            data: { role },
+            data: { role: role as Role },
         });
     }
 }
