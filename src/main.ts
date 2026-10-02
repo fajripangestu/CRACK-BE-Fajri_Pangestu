@@ -21,6 +21,8 @@ async function bootstrap() {
       'http://localhost:3000',                // frontend lokal
       'https://manutics.netlify.app'      // frontend di Netlify
     ],
+    
+    credentials: true, // jika menggunakan cookies, set ini ke true
   });
   
   await app.listen(process.env.PORT ?? 3000);
