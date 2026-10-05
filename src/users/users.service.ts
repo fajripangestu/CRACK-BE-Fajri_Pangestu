@@ -19,18 +19,29 @@ export class UsersService {
     return this.usersRepository.getOneUserById(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+//   async update(id: number, updateUserDto: UpdateUserDto) {
+//   const user = await this.usersRepository.getOneUserById(id);
+//   if (!user) throw new NotFoundException(`User #${id} not found`);
+
+//   return this.usersRepository.updateRole(id, updateUserDto);
+// }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
 
-  delegateRole(userId: number, newRole: string) {
-    const user = this.usersRepository.getOneUserById(userId);
+  async delegateRole(userId: number, newRole: string) {
+    const user = await this.usersRepository.getOneUserById(userId);
     if (!user) throw new NotFoundException('User not found');
+  const updated = await this.usersRepository.updateRole(userId, newRole);
 
-    return this.usersRepository.updateRole(userId, newRole);
+    // return JSON yang lebih informatif
+    return {
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      role: updated.role,
+      updatedAt: updated.updatedAt,
+    };
   }
 }

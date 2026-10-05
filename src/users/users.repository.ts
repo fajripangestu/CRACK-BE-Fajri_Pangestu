@@ -19,7 +19,7 @@ export class UsersRepository{
         });
     }
 
-    getOneUserById(id: number){
+    async getOneUserById(id: number){
         return this.prisma.user.findUnique(
             {
                 where: {id: id},
@@ -41,7 +41,7 @@ export class UsersRepository{
             throw new Error(`Invalid role: ${role}`);
         }
 
-        return this.prisma.user.update({
+        return await this.prisma.user.update({
             where: { id },
             data: { role: role as Role },
         });

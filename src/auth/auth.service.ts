@@ -26,6 +26,7 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.authRepo.findUserByEmail(email);
+    
     if (!user) throw new UnauthorizedException('Email tidak ditemukan');
 
     const valid = await bcrypt.compare(password, user.password);
