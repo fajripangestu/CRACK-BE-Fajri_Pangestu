@@ -35,15 +35,32 @@ export class UsersRepository{
         );
     }
     
-    async updateRole(id: number, role: string) {
+    async updateRole(id: number, role: string, modifierId: number){ 
         const validRoles = Object.values(Role); // ['USER','ADMIN','SUPERADMIN']
         if (!validRoles.includes(role as Role)) {
             throw new Error(`Invalid role: ${role}`);
         }
 
-        return await this.prisma.user.update({
+        // ambil user lama untuk tahu oldValue
+        const user = await this.prisma.user.findUnique({ where: { id } });
+
+        // update role user
+        const updatedUser = await this.prisma.user.update({
             where: { id },
             data: { role: role as Role },
         });
+
+        // simpan log ke UserHistory
+        await this.prisma.userHistory.create({
+            data: {
+            userId: id,
+            field: "role",
+            oldValue: user?.role,
+            newValue: role,
+            changedBy: modifierId, // siapa yang mengubah
+            },
+        });
+
+        return updatedUser;
     }
 }

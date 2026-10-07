@@ -22,6 +22,23 @@ model User {
   role          Role     @default(USER)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  histories     UserHistory[] @relation("HistoryOf")
+  modifications UserHistory[] @relation("ModifiedBy")
+}
+
+model UserHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  field     String
+  oldValue  String?
+  newValue  String?
+  changedAt DateTime @default(now())
+
+  changedBy Int
+  modifier  User     @relation("ModifiedBy",fields: [changedBy], references: [id])
+
+  user      User     @relation("HistoryOf",fields: [userId], references: [id])
 }
 
 enum Role {

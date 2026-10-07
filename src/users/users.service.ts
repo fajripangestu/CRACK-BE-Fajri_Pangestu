@@ -7,10 +7,6 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository){}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
-
   getAllUsers(){
     return this.usersRepository.getAllUsers();
   }
@@ -19,21 +15,10 @@ export class UsersService {
     return this.usersRepository.getOneUserById(id);
   }
 
-//   async update(id: number, updateUserDto: UpdateUserDto) {
-//   const user = await this.usersRepository.getOneUserById(id);
-//   if (!user) throw new NotFoundException(`User #${id} not found`);
-
-//   return this.usersRepository.updateRole(id, updateUserDto);
-// }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
-  async delegateRole(userId: number, newRole: string) {
+  async delegateRole(userId: number, newRole: string, modifierId: number) {
     const user = await this.usersRepository.getOneUserById(userId);
     if (!user) throw new NotFoundException('User not found');
-  const updated = await this.usersRepository.updateRole(userId, newRole);
+    const updated = await this.usersRepository.updateRole(userId, newRole, modifierId);
 
     // return JSON yang lebih informatif
     return {

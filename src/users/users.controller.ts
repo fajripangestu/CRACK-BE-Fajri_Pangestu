@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, BadRequestException, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -30,12 +30,15 @@ export class UsersController {
   @Patch(':id')
   async delegateRole(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: any,
   ) {
+    const modifierId = req.user.id; // Ambil ID pengguna yang melakukan perubahan dari token JWT
+
     if (!updateUserDto.role) {
       throw new BadRequestException('Role is required');
     }
-    return await this.usersService.delegateRole(id, updateUserDto.role);
+    return await this.usersService.delegateRole(id, updateUserDto.role, modifierId);
   }
 
 

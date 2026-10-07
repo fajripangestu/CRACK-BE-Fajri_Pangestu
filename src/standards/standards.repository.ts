@@ -4,7 +4,7 @@ import { Injectable } from "@nestjs/common";
 export class StandardsRepository{
 
     getAllStandards(){
-        return 'This is standards from reposiroty'
+        return 'This is standards from repository'
     }
 
     getOneStandardById(id: number){
