@@ -43,7 +43,8 @@ export class UsersController {
 
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    const modifierId = req.user.id;
+    return this.usersService.remove(+id, modifierId);
   }
 }

@@ -29,4 +29,28 @@ export class UsersService {
       updatedAt: updated.updatedAt,
     };
   }
+
+   // 🔹 Create user baru
+  async create(data: { name: string; email: string; password: string }) {
+    return this.usersRepository.createUser(data);
+  }
+
+  async remove(id: number, modifierId: number) {
+  const user = await this.usersRepository.getOneUserById(id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // simpan log lewat repository
+  await this.usersRepository.logUserHistory({
+    userId: id,
+    field: "user",
+    oldValue: `${user.name} (${user.email})`,
+    newValue: null,
+    changedBy: modifierId,
+  });
+
+  return this.usersRepository.removeUser(id);
+}
+
 }
