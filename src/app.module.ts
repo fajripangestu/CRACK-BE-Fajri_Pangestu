@@ -18,9 +18,10 @@ import { MaterialLocationsModule } from './material-locations/material-locations
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UserHistoryModule } from './user-history/user-history.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
-  imports: [ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule, AuthModule, UserHistoryModule],
+  imports: [ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule, AuthModule, UserHistoryModule, DashboardModule],
   controllers: [AppController],
   providers: [AppService],
 })

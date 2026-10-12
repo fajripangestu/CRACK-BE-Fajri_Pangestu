@@ -9,6 +9,15 @@ export class AuthRepository {
   async findUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        password: true, // ambil password hash untuk verifikasi
+      }
     });
   }
 
