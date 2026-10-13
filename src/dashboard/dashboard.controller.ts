@@ -8,18 +8,25 @@ import { DashboardService } from './dashboard.service';
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
   @Get('superadmin')
-  getLoginSuperadmin() {
-    return new UnauthorizedException('Unauthorized access. Please log in as a superadmin.');
+  getSuperadminDashboard() {
+    return this.dashboardService.getSuperadminData();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('admin')
-  getLoginAdmin() {
-    return new UnauthorizedException('Unauthorized access. Please log in as an admin.');
+  getAdminDashboard() {
+    return this.dashboardService.getAdminData();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('USER')
   @Get('user')
-  getLoginUser() {
-    return new UnauthorizedException('Unauthorized access. Please log in as a user.');
+  getUserDashboard() {
+    return this.dashboardService.getUserData();
   }
 }
+

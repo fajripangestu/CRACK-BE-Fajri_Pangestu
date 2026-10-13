@@ -1,11 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DashboardRepository } from './dashboard.repository';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly dashboardRepository: DashboardRepository){}
+  getSuperadminData() {
+    // Data khusus superadmin
+    return {
+      message: 'Data rahasia superadmin',
+      stats: {
+        totalUsers: 1200,
+        activeAdmins: 15,
+      },
+    };
+  }
 
-  getAllUsers(){
-    return this.dashboardRepository.getAllUsers();
+  getAdminData() {
+    // Data khusus admin
+    return {
+      message: 'Data khusus admin',
+      reports: ['Report A', 'Report B'],
+    };
+  }
+
+  getUserData() {
+    // Data khusus user
+    return {
+      message: 'Data user biasa',
+      activities: ['Order #123', 'Order #456'],
+    };
   }
 }
