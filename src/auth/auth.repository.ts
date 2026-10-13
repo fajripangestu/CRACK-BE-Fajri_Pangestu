@@ -5,8 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class AuthRepository {
   constructor(private prisma: PrismaService) {}
 
-  // Cari user berdasarkan email
-  async findUserByEmail(email: string) {
+  async findOneUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
       select: {
@@ -16,7 +15,7 @@ export class AuthRepository {
         role: true,
         createdAt: true,
         updatedAt: true,
-        password: true, // ambil password hash untuk verifikasi
+        password: true,
       }
     });
   }

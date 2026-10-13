@@ -4,17 +4,18 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private authRepo: AuthRepository,
+    private authRepository: AuthRepository,
     private jwt: JwtService,
   ) {}
 
   async register(dto: RegisterDto) {
     const hash = await bcrypt.hash(dto.password, 10);
-    const user = await this.authRepo.createUser(dto.name, dto.email, hash);
+    const user = await this.authRepository.createUser(dto.name, dto.email, hash);
     const secret = process.env.JWT_SECRET || 'default_secret_key'; // Fallback secret key
     
     const token = jwt.sign({ sub: user.id }, secret, {
@@ -24,19 +25,20 @@ export class AuthService {
     return { user, token };
   }
 
-  async login(email: string, password: string) {
-    const user = await this.authRepo.findUserByEmail(email);
-    
-    if (!user) throw new UnauthorizedException('Email tidak ditemukan');
+  async login(credentials: LoginDto) {
+    const user = await this.authRepository.findOneUserByEmail(credentials.email);
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new UnauthorizedException('Password salah');
+    if (!user) throw new UnauthorizedException('Email atau password salah');
+
+    const valid = await bcrypt.compare(credentials.password, user.password);
+    if (!valid) throw new UnauthorizedException('Email atau password salah');
 
     const token = await this.jwt.signAsync({
       sub: user.id,
       email: user.email,
       role: user.role,
     });
+
     return { access_token: token, user };
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,8 +14,8 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    console.log("📩 Login request diterima:", body);
-    return this.authService.login(body.email, body.password);
+  async login(@Body() credentials: LoginDto) {
+    console.log("📩 Login request diterima:", credentials);
+    return this.authService.login(credentials);
   }
 }
