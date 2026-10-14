@@ -7,7 +7,7 @@ export class UserHistoryRepository{
 
     async findAll() {
         return this.prisma.userHistory.findMany({
-        include: { modifier: true },
+        include: { modifier: true, user: true},
         orderBy: { changedAt: "desc" },
         });
     }
@@ -15,7 +15,7 @@ export class UserHistoryRepository{
     async findByUser(userId: number) {
         return this.prisma.userHistory.findMany({
         where: { userId },
-        include: { modifier: true },
+        include: { modifier: true, user: true },
         orderBy: { changedAt: "desc" },
         });
     }
