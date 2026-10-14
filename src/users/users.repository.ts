@@ -17,7 +17,7 @@ export class UsersRepository{
                 updatedAt: true,
             },
             orderBy: {
-                createdAt: 'asc'
+                updatedAt: 'desc'
             }
         });
     }

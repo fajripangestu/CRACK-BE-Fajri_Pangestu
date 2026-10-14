@@ -6,17 +6,18 @@ import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "../auth/roles.decorator";
 
 @Controller("userHistories")
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserHistoryController {
   constructor(private readonly userHistoryService: UserHistoryService) {}
 
-  @Roles("SUPERADMIN")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER_ADMIN")
   @Get()
   async getAll() {
     return this.userHistoryService.findAll();
   }
 
-  @Roles("SUPERADMIN")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("SUPER_ADMIN")
   @Get(":userId")
   async getByUser(@Param("userId") userId: string) {
     return this.userHistoryService.findByUser(Number(userId));
