@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthRepository {
   constructor(private prisma: PrismaService) {}
 
+  // Cari user berdasarkan email
+  // Fungsi ini digunakan untuk mencari satu user berdasarkan email yang diberikan.
+  // Jika user ditemukan, data user akan dikembalikan, termasuk password hash untuk keperluan autentikasi.
   async findOneUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
@@ -20,10 +24,13 @@ export class AuthRepository {
     });
   }
 
-  // Buat user baru
-  async createUser(name: string, email: string, password: string) {
+  // Membuat user baru
+  // Fungsi ini digunakan untuk membuat user baru di database.
+  // Data name, email, dan password hash akan diterima sebagai parameter.
+  // Setelah user berhasil dibuat, data user yang baru dibuat akan dikembalikan.
+  async createUser(name: string, email: string, passwordHash: string) {
     return this.prisma.user.create({
-      data: { name, email, password },
+      data: { name, email, password: passwordHash },
     });
   }
 

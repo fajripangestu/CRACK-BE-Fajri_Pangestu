@@ -31,7 +31,7 @@ export class UsersService {
   }
 
    // 🔹 Create user baru
-  async create(data: { name: string; email: string; password: string }) {
+  async createUser(data: { name: string; email: string; password: string }) {
     return this.usersRepository.createUser(data);
   }
 

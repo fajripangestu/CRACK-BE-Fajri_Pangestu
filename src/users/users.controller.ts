@@ -17,14 +17,18 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
   
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
   @Get(':id')
   getOneUserById(@Param('id', ParseIntPipe) id: number){
     return this.usersService.getOneUserById(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.usersService.createUser(createUserDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
