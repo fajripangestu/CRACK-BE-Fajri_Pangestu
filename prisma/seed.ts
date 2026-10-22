@@ -10,16 +10,32 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  const passwordHash = await bcrypt.hash('super123admin', 10);
+  const passwordHash1 = await bcrypt.hash('super123admin', 10);
+  const passwordHash2 = await bcrypt.hash('admin123', 10);
+  const passwordHash3 = await bcrypt.hash('user123', 10);
 
   await prisma.user.deleteMany(); 
-  await prisma.user.create({
-    data: {
+  await prisma.user.createMany({
+    data: [
+      {
       email: 'superadmin@example.com',
-      password: passwordHash,
+      password: passwordHash1,
       name: "SUPER ADMIN",
       role: "SUPER_ADMIN",
     },
+      {
+      email: 'admin1@example.com',
+      password: passwordHash2,
+      name: "Admin 1",
+      role: "ADMIN",
+    },
+      {
+      email: 'user1@example.com',
+      password: passwordHash3,
+      name: "User 1",
+      role: "USER",
+    },
+  ],
   });
 }
 

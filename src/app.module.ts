@@ -19,9 +19,11 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UserHistoryModule } from './user-history/user-history.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ConfigModule } from '@nestjs/config';
+import { CustomerOrdersModule } from './customer-orders/customer-orders.module';
 
 @Module({
-  imports: [ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule, AuthModule, UserHistoryModule, DashboardModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }),ProductsModule, CoatingsModule, DimensionsModule, CheckingResultsModule, ProductionDetailsModule, LabResultsModule, CoilRawMaterialsModule, ProductionPlansModule, StandardsModule, SalesModule, ProcurementsModule, OrdersModule, UsersModule, MaterialLocationsModule, PrismaModule, AuthModule, UserHistoryModule, DashboardModule, CustomerOrdersModule],
   controllers: [AppController],
   providers: [AppService],
 })

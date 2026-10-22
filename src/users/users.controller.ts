@@ -34,18 +34,18 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Patch(':id')
-  async delegateRole(
+  async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: { user: { userId: number } },
   ) {
-    console.log("Dto diterima:", updateUserDto);
     const modifierId = req.user.userId;
 
-    if (!updateUserDto.role) {
-      throw new BadRequestException('Role is required');
+    if (!updateUserDto.name && !updateUserDto.email && !updateUserDto.role) {
+      throw new BadRequestException('Tidak ada data yang diubah');
     }
-    return await this.usersService.delegateRole(id, updateUserDto.role, modifierId);
+
+    return await this.usersService.updateUser(id, updateUserDto, modifierId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

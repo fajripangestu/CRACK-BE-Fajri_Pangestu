@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { Role } from "generated/prisma/enums";
 import { PrismaService } from "src/prisma/prisma.service";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { Prisma } from "generated/prisma/client";
 
 @Injectable()
 export class UsersRepository{
@@ -38,34 +40,43 @@ export class UsersRepository{
         );
     }
     
-    async updateRole(id: number, role: string, modifierId: number){ 
-        const validRoles = Object.values(Role); // ['USER','ADMIN','SUPERADMIN']
-        if (!validRoles.includes(role as Role)) {
-            throw new BadRequestException(`Invalid role: ${role}`);
-        }
-
-        // ambil user lama untuk tahu oldValue
+    async updateUser(id: number, dto: UpdateUserDto, modifierId: number) {
         const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user) throw new NotFoundException('User tidak ditemukan');
 
-        // update role user
-        const updatedUser = await this.prisma.user.update({
-            where: { id },
-            data: { role: role as Role },
-        });
+        // Hanya field yang benar-benar berubah
+        const fields = ['name', 'email', 'role'] as const;
+        const changed = fields.filter((f) => dto[f] !== undefined && dto[f] !== user[f]);
+        console.log('DTO:', dto, '| field berubah:', changed);
+        if (changed.length === 0) return user;
 
-        // simpan log ke UserHistory
-        await this.prisma.userHistory.create({
-            data: {
-            userId: id,
-            field: "role",
-            oldValue: user?.role,
-            newValue: role,
-            changedBy: modifierId, // siapa yang mengubah
-            },
-        });
-
-        return updatedUser;
-    }
+        try {
+            const [updated] = await this.prisma.$transaction([
+            this.prisma.user.update({
+                where: { id },
+                data: Object.fromEntries(changed.map((f) => [f, dto[f]])),
+            }),
+            // Satu baris riwayat per field yang berubah
+            ...changed.map((f) =>
+                this.prisma.userHistory.create({
+                data: {
+                    userId: id,
+                    field: f,
+                    oldValue: String(user[f]),
+                    newValue: String(dto[f]),
+                    changedBy: modifierId,
+                },
+                }),
+            ),
+            ]);
+            return updated;
+        } catch (e) {
+            if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+            throw new ConflictException('Email sudah dipakai user lain');
+            }
+            throw e;
+        }
+        }
 
     async createUser(data: { name: string; email: string; password: string }) {
         return this.prisma.user.create({

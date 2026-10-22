@@ -135,12 +135,53 @@ enum Product_status {
   Hold
 }
 
+enum Chemical_Treatment {
+  Clear_Resin
+  Tinted_Resin
+  Passivation
+}
+
 model example {
   id Int @id @default(autoincrement())
   name String
 }
 
-model example2 {
+model CustomerOrder {
   id Int @id @default(autoincrement())
-  name String
+  userId Int
+  SO String
+  productName Int
+  productType Product_type
+  coatingType Coating_type
+  coatingMass Int
+  TCT Float
+  minTCT Float
+  maxTCT Float
+  BMT Float
+  minBMT Float
+  maxBMT Float
+  width Float
+  minWidth Float
+  maxWidth Float
+  Grade String
+  YS Int
+  minYS Int
+  maxYS Int
+  TS Int
+  minTS Int
+  maxTS Int
+  EL Float
+  minEL Float
+  maxEL Float
+  chemicalTreatment Chemical_Treatment
+  customerDetail Int
+  minCoilWeight Int
+  maxCoilWeight Int
+  totalQuantity Int
+  export String
+  deliveryTime DateTime
+  productionStatus String
+  orderAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  note String
 }

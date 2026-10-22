@@ -15,20 +15,20 @@ export class UsersService {
     return this.usersRepository.getOneUserById(id);
   }
 
-  async delegateRole(userId: number, newRole: string, modifierId: number) {
-    const user = await this.usersRepository.getOneUserById(userId);
-    if (!user) throw new NotFoundException('User not found');
-    const updated = await this.usersRepository.updateRole(userId, newRole, modifierId);
+  async updateUser(userId: number, dto: UpdateUserDto, modifierId: number) {
+  // Pengecekan "user ada atau tidak" sudah dilakukan di repository,
+  // jadi tidak perlu query getOneUserById lagi di sini.
+  const updated = await this.usersRepository.updateUser(userId, dto, modifierId);
 
-    // return JSON yang lebih informatif
-    return {
-      id: updated.id,
-      name: updated.name,
-      email: updated.email,
-      role: updated.role,
-      updatedAt: updated.updatedAt,
-    };
-  }
+  // Kembalikan field yang aman saja (tanpa password)
+  return {
+    id: updated.id,
+    name: updated.name,
+    email: updated.email,
+    role: updated.role,
+    updatedAt: updated.updatedAt,
+  };
+}
 
    // 🔹 Create user baru
   async createUser(data: { name: string; email: string; password: string }) {

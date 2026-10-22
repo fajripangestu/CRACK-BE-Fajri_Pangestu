@@ -11,7 +11,15 @@ export class AuthService {
   constructor(
     private authRepository: AuthRepository,
     private jwt: JwtService,
+    
   ) {}
+
+  private signToken(user: { id: number; email: string; role: string }) {
+    return this.jwt.signAsync(
+      { sub: user.id, email: user.email, role: user.role },
+      { expiresIn: '1h' },
+    );
+  }
 
   // Data name, email, dan password dari user akan diterima melalui RegisterDto
   // kemudian password akan di-hash menggunakan bcrypt sebelum disimpan ke database
@@ -20,11 +28,8 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const hash = await bcrypt.hash(dto.password, 10);
     const user = await this.authRepository.createUser(dto.name, dto.email, hash);
-    const secret = process.env.JWT_SECRET || 'default_secret_key'; // Fallback secret key
-    
-    const token = jwt.sign({ sub: user.id }, secret, {
-      expiresIn: '1h',
-    });
+
+    const token = await this.signToken(user);
 
     return { user, token };
   }
@@ -38,12 +43,11 @@ export class AuthService {
     const valid = await bcrypt.compare(credentials.password, user.password);
     if (!valid) throw new UnauthorizedException('Email atau password salah');
 
-    const token = await this.jwt.signAsync({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    }, { expiresIn: '1h' });
+    const token = await this.signToken(user);
 
-    return { access_token: token, user };
+    // Jangan kirim hash password ke client
+    const { password, ...safeUser } = user;
+
+    return { access_token: token, user: safeUser };
   }
 }
