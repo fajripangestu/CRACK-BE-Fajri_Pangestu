@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
@@ -13,22 +22,25 @@ export class SalesController {
   }
 
   @Get()
-  getAllSales(){
+  getAllSales() {
     return this.salesService.getAllSales();
   }
 
   @Get(':id')
-  getOneSaleById(@Param('id', ParseIntPipe) id: number){
+  getOneSaleById(@Param('id', ParseUUIDPipe) id: string) {
     return this.salesService.getOneSaleById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateSaleDto: UpdateSaleDto,
+  ) {
+    return this.salesService.update(id, updateSaleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.salesService.remove(id);
   }
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ProcurementsService } from './procurements.service';
 import { CreateProcurementDto } from './dto/create-procurement.dto';
 import { UpdateProcurementDto } from './dto/update-procurement.dto';
@@ -13,22 +22,25 @@ export class ProcurementsController {
   }
 
   @Get()
-  getAllProcurements(){
+  getAllProcurements() {
     return this.procurementsService.getAllProcurements();
   }
 
   @Get(':id')
-  getOneProcurementById(@Param('id', ParseIntPipe) id: number){
+  getOneProcurementById(@Param('id', ParseUUIDPipe) id: string) {
     return this.procurementsService.getOneProcurementById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProcurementDto: UpdateProcurementDto) {
-    return this.procurementsService.update(+id, updateProcurementDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateProcurementDto: UpdateProcurementDto,
+  ) {
+    return this.procurementsService.update(id, updateProcurementDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.procurementsService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.procurementsService.remove(id);
   }
 }

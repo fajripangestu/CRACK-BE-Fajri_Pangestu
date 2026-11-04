@@ -5,25 +5,27 @@ import { ProductionPlansRepository } from './production-plans.repository';
 
 @Injectable()
 export class ProductionPlansService {
-  constructor(private readonly productionPlansRepository: ProductionPlansRepository){}
-  
+  constructor(
+    private readonly productionPlansRepository: ProductionPlansRepository,
+  ) {}
+
   create(createProductionPlanDto: CreateProductionPlanDto) {
     return 'This action adds a new productionPlan';
   }
 
-  getAllProductionPlans(){
+  getAllProductionPlans() {
     return this.productionPlansRepository.getAllProductionPlans();
   }
 
-  getOneProductionPlanById(id: number){
+  getOneProductionPlanById(id: string) {
     return this.productionPlansRepository.getOneProductionPlanById(id);
   }
 
-  update(id: number, updateProductionPlanDto: UpdateProductionPlanDto) {
+  update(id: string, updateProductionPlanDto: UpdateProductionPlanDto) {
     return `This action updates a #${id} productionPlan`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} productionPlan`;
   }
 }

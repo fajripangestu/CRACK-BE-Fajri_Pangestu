@@ -5,25 +5,25 @@ import { OrdersRepository } from './orders.repository';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly ordersRepository: OrdersRepository){}
+  constructor(private readonly ordersRepository: OrdersRepository) {}
 
   create(createOrderDto: CreateOrderDto) {
     return 'This action adds a new order';
   }
 
-  getAllOrders(){
+  getAllOrders() {
     return this.ordersRepository.getAllOrders();
   }
 
-  getOneOrderById(id: number){
+  getOneOrderById(id: string) {
     return this.ordersRepository.getOneOrderById(id);
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
+  update(id: string, updateOrderDto: UpdateOrderDto) {
     return `This action updates a #${id} order`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} order`;
   }
 }

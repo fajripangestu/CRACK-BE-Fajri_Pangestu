@@ -1,6 +1,6 @@
 // user-history.service.ts
-import { Injectable } from "@nestjs/common";
-import { UserHistoryRepository } from "./user-history.repository";
+import { Injectable } from '@nestjs/common';
+import { UserHistoryRepository } from './user-history.repository';
 
 @Injectable()
 export class UserHistoryService {
@@ -10,23 +10,23 @@ export class UserHistoryService {
     return this.userHistoryRepository.findAll();
   }
 
-  async findByUser(userId: number) {
+  async findByUser(userId: string) {
     return this.userHistoryRepository.findByUser(userId);
   }
 
   async logChange(
-    userId: number,
+    userId: string,
     field: string,
     oldValue: string | null,
     newValue: string | null,
-    changedBy: number
+    changedBy: string,
   ) {
     return this.userHistoryRepository.createHistory({
-    userId,
-    field,
-    oldValue: oldValue ?? undefined,
-    newValue: newValue ?? undefined,
-    changedBy,
-  });
+      userId,
+      field,
+      oldValue: oldValue ?? undefined,
+      newValue: newValue ?? undefined,
+      changedBy,
+    });
   }
 }

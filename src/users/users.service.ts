@@ -1,56 +1,47 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository){}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  getAllUsers(){
+  getAllUsers() {
     return this.usersRepository.getAllUsers();
   }
 
-  getOneUserById(id: number){
+  getOneUserById(id: string) {
     return this.usersRepository.getOneUserById(id);
   }
 
-  async updateUser(userId: number, dto: UpdateUserDto, modifierId: number) {
-  // Pengecekan "user ada atau tidak" sudah dilakukan di repository,
-  // jadi tidak perlu query getOneUserById lagi di sini.
-  const updated = await this.usersRepository.updateUser(userId, dto, modifierId);
+  async updateUser(userId: string, dto: UpdateUserDto, modifierId: string) {
+    // Pengecekan "user ada atau tidak" sudah dilakukan di repository,
+    // jadi tidak perlu query getOneUserById lagi di sini.
+    const updated = await this.usersRepository.updateUser(
+      userId,
+      dto,
+      modifierId,
+    );
 
-  // Kembalikan field yang aman saja (tanpa password)
-  return {
-    id: updated.id,
-    name: updated.name,
-    email: updated.email,
-    role: updated.role,
-    updatedAt: updated.updatedAt,
-  };
-}
-
-   // 🔹 Create user baru
-  async createUser(data: { name: string; email: string; password: string }) {
-    return this.usersRepository.createUser(data);
+    // Kembalikan field yang aman saja (tanpa password)
+    return {
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      role: updated.role,
+      department: updated.department,
+      position: updated.position,
+      updatedAt: updated.updatedAt,
+    };
   }
 
-  async remove(id: number, modifierId: number) {
-  const user = await this.usersRepository.getOneUserById(id);
-  if (!user) {
-    throw new Error("User not found");
+  // 🔹 Create user baru
+  async createUser(data: CreateUserDto, modifierId: string) {
+    return this.usersRepository.createUser(data, modifierId);
   }
 
-  // simpan log lewat repository
-  await this.usersRepository.logUserHistory({
-    userId: id,
-    field: "user",
-    oldValue: `${user.name} (${user.email})`,
-    newValue: null,
-    changedBy: modifierId,
-  });
-
-  return this.usersRepository.removeUser(id);
-}
-
+  async remove(id: string, modifierId: string) {
+    return this.usersRepository.removeUser(id, modifierId);
+  }
 }

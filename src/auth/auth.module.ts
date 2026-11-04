@@ -16,12 +16,18 @@ import { JwtAuthGuard } from './jwt-auth.guard';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1d' },
+        signOptions: { algorithm: 'HS256', expiresIn: '1d' },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, PrismaService, JwtStrategy, JwtAuthGuard],
+  providers: [
+    AuthService,
+    AuthRepository,
+    PrismaService,
+    JwtStrategy,
+    JwtAuthGuard,
+  ],
   exports: [JwtAuthGuard],
 })
 export class AuthModule {}

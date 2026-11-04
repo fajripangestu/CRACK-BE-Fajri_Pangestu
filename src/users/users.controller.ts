@@ -1,47 +1,66 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, BadRequestException, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  UseGuards,
+  BadRequestException,
+  Req,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Department } from 'generated/prisma/client';
+import { Departments } from 'src/auth/departments.decorator';
+import { DepartmentsGuard } from 'src/auth/departments.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, DepartmentsGuard)
   @Roles('SUPER_ADMIN')
+  @Departments(Department.IT)
   @Get()
-  getAllUsers(){
+  getAllUsers() {
     return this.usersService.getAllUsers();
   }
-  
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Get(':id')
-  getOneUserById(@Param('id', ParseIntPipe) id: number){
+  getOneUserById(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getOneUserById(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @Req() req: { user: { userId: string } },
+  ) {
+    return this.usersService.createUser(createUserDto, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Patch(':id')
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: { user: { userId: number } },
+    @Req() req: { user: { userId: string } },
   ) {
     const modifierId = req.user.userId;
 
-    if (!updateUserDto.name && !updateUserDto.email && !updateUserDto.role) {
+    if (!updateUserDto.name && !updateUserDto.email && !updateUserDto.role && !updateUserDto.department && !updateUserDto.position) {
       throw new BadRequestException('Tidak ada data yang diubah');
     }
 
@@ -52,8 +71,8 @@ export class UsersController {
   @Roles('SUPER_ADMIN')
   @Delete(':id')
   remove(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req: { user: { userId: number } },
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: { user: { userId: string } },
   ) {
     const modifierId = req.user.userId;
     return this.usersService.remove(id, modifierId);

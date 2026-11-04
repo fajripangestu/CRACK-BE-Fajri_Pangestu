@@ -1,8 +1,16 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEmail, IsString, Matches, MaxLength, IsEnum, IsOptional, MinLength } from "class-validator";
-import { Role } from "generated/prisma/client";
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsString,
+  Matches,
+  MaxLength,
+  IsEnum,
+  IsOptional,
+  MinLength,
+} from 'class-validator';
+import { Department, Role, Position } from 'generated/prisma/client';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -16,7 +24,16 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsEnum(Role)
-  role?: Role;   
+  role?: Role;
+
+  @IsOptional()
+  @IsEnum(Department)
+  department?: Department;
+
+  
+  @IsOptional()
+  @IsEnum(Position)
+  position?: Position;
   // @ApiPropertyOptional({ example: 'User 1', description: 'User name' })
   // @IsOptional()
   // @IsString()
@@ -37,5 +54,4 @@ export class UpdateUserDto {
   // @IsOptional()
   // @IsEnum(Role)
   // role?: Role;
-
 }

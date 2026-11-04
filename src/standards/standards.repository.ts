@@ -1,13 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class StandardsRepository{
+export class StandardsRepository {
+  getAllStandards() {
+    return 'This is standards from repository';
+  }
 
-    getAllStandards(){
-        return 'This is standards from repository'
-    }
-
-    getOneStandardById(id: number){
-        return `This is standard ${id} from repository`;
-    }
+  getOneStandardById(id: string) {
+    return `This is standard ${id} from repository`;
+  }
 }

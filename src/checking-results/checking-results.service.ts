@@ -5,25 +5,27 @@ import { CheckingResultsRepository } from './checking-results.repository';
 
 @Injectable()
 export class CheckingResultsService {
-  constructor (private readonly checkingResultsRepository: CheckingResultsRepository){}
+  constructor(
+    private readonly checkingResultsRepository: CheckingResultsRepository,
+  ) {}
 
   create(createCheckingResultDto: CreateCheckingResultDto) {
     return 'This action adds a new checkingResult';
   }
 
-  getAllCheckingResults(){
+  getAllCheckingResults() {
     return this.checkingResultsRepository.getAllCheckingResults();
   }
 
-  getOneCheckingResultById(id: number){
+  getOneCheckingResultById(id: string) {
     return this.checkingResultsRepository.getOneCheckingResultById(id);
   }
 
-  update(id: number, updateCheckingResultDto: UpdateCheckingResultDto) {
+  update(id: string, updateCheckingResultDto: UpdateCheckingResultDto) {
     return `This action updates a #${id} checkingResult`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} checkingResult`;
   }
 }

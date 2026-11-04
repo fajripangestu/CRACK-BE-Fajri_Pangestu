@@ -5,7 +5,7 @@ import { UserHistoryRepository } from './user-history.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports:[PrismaModule],
+  imports: [PrismaModule],
   controllers: [UserHistoryController],
   providers: [UserHistoryService, UserHistoryRepository],
 })

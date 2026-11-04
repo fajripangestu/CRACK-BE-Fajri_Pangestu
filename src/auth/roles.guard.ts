@@ -10,7 +10,10 @@ export class RolesGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     // Ambil role yang dibutuhkan dari metadata controller
-    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
     if (!requiredRoles) {
       return true; // kalau tidak ada role spesifik, semua boleh akses
     }

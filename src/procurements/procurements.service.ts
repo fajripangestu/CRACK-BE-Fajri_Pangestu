@@ -5,25 +5,27 @@ import { ProcurementsRepository } from './procurements.repository';
 
 @Injectable()
 export class ProcurementsService {
-  constructor(private readonly procurementsRepository: ProcurementsRepository){}
+  constructor(
+    private readonly procurementsRepository: ProcurementsRepository,
+  ) {}
 
   create(createProcurementDto: CreateProcurementDto) {
     return 'This action adds a new procurement';
   }
 
-  getAllProcurements(){
+  getAllProcurements() {
     return this.procurementsRepository.getAllProcurements();
   }
 
-  getOneProcurementById(id: number){
+  getOneProcurementById(id: string) {
     return this.procurementsRepository.getOneProcurementById(id);
   }
 
-  update(id: number, updateProcurementDto: UpdateProcurementDto) {
+  update(id: string, updateProcurementDto: UpdateProcurementDto) {
     return `This action updates a #${id} procurement`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} procurement`;
   }
 }

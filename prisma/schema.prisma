@@ -14,53 +14,169 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String     @id @default(uuid()) @db.Uuid
   name          String
-  email         String   @unique
+  email         String     @unique
   password      String
   refresh_token String?
-  role          Role     @default(USER)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  role          Role       @default(USER)
+  department    Department @default(CUSTOMER)
+  position      Position   @default(CUSTOMER)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  histories     UserHistory[] @relation("HistoryOf")
-  modifications UserHistory[] @relation("ModifiedBy")
+  histories        UserHistory[]    @relation("HistoryOf")
+  modifications    UserHistory[]    @relation("ModifiedBy")
+  customer_orders  CustomerOrder[]  @relation("OrderedBy")
+  customer_details CustomerDetail[] @relation("Customer_Detail")
+  approvalDecisions CustomerOrderApproval[] @relation("ApprovalDecidedBy")
+  customerOrderHistoryChanges CustomerOrderHistory[] @relation("CustomerOrderHistoryChangedBy")
 }
 
 model UserHistory {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  field     String
-  oldValue  String?
-  newValue  String?
-  changedAt DateTime @default(now())
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String?  @db.Uuid
+  userName    String?
+  field       String
+  oldValue    String?
+  newValue    String?
+  action      String   @default("EDIT")
+  status      Boolean  @default(true)
+  changedAt   DateTime @default(now())
+  changedBy   String?  @db.Uuid
 
-  changedBy Int
-  modifier  User     @relation("ModifiedBy",fields: [changedBy], references: [id])
-
-  user      User     @relation("HistoryOf",fields: [userId], references: [id])
+  modifier User? @relation("ModifiedBy", fields: [changedBy], references: [id], onDelete: SetNull)
+  user     User? @relation("HistoryOf", fields: [userId], references: [id], onDelete: SetNull)
 }
 
 enum Role {
   SUPER_ADMIN
+  OWNER
   ADMIN
   USER
 }
 
+enum Department {
+  PRODUCTION
+  QA
+  PPC
+  PROCUREMENT
+  ENGINEER
+  IT
+  SALES
+  WAREHOUSE
+  MAINTENANCE
+  HRD
+  OWNER
+  CUSTOMER
+  OTHER
+}
+
+enum Position {
+  OWNER
+  GENERAL_MANAGER
+  CONSULTANT
+  GM_ASSISTANT
+  MANAGER
+  SUPERVISOR
+  TEAM_LEADER
+  ENGINEER
+  ADMINISTRATIVE_STAFF
+  OPERATOR
+  TESTER
+  CUSTOMER
+  INTERNSHIP
+  OTHER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Dimension {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid()) @db.Uuid
   name      String   @unique
+  unit      String
   thickness Float
   width     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  products Product_name[]
+}
+
+model WidthStandard {
+  id                  String   @id @default(uuid()) @db.Uuid
+  standardName        String
+  itemType            String
+  unit                String
+  lowerRangeWidth     Float
+  upperRangeWidth     Float
+  minusWidthTolerance Float
+  plusWidthTolerance  Float
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ThicknessStandard {
+  id                      String   @id @default(uuid()) @db.Uuid
+  standardName            String
+  itemType                String
+  unit                    String
+  lowerRangeWidth         Float
+  upperRangeWidth         Float
+  lowerRangeThickness     Float
+  upperRangeThickness     Float
+  minusThicknessTolerance Float
+  plusThicknessTolerance  Float
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model YSStandard {
+  id               String   @id @default(uuid()) @db.Uuid
+  standardName     String
+  itemType         String
+  unit             String
+  YS               Int
+  minusYSTolerance Float
+  plusYSTolerance  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TSStandard {
+  id               String   @id @default(uuid()) @db.Uuid
+  standardName     String
+  itemType         String
+  unit             String
+  TS               Int
+  minusTSTolerance Float
+  plusTSTolerance  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ElongationStandard {
+  id               String   @id @default(uuid()) @db.Uuid
+  standardName     String
+  itemType         String
+  unit             String
+  Elongation       Float
+  minusElTolerance Float
+  plusElTolerance  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Lab_result {
-  id           Int      @id @default(autoincrement())
-  code         String   @unique
-  Tensile      Int
-  Yield        Int
+  id           String   @id @default(uuid()) @db.Uuid
+  productCode  String   @unique
+  YS           Int
+  TS           Int
   Elongation   Float
   Coating_mass Float
   BMT          Float
@@ -70,29 +186,32 @@ model Lab_result {
   updatedAt    DateTime @updatedAt
 }
 
+model ProductInspectionResult {
+  id          String @id @default(uuid()) @db.Uuid
+  productCode String @unique
+}
+
 model Coating_composition {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid()) @db.Uuid
   name      String
   Zn        Float
   Al        Float
-  Ti        Float
-  Si        Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Coating {
-  id                 Int      @id @default(autoincrement())
-  name               String   @unique
+  id                 String       @id @default(uuid()) @db.Uuid
+  name               String       @unique
   Type               Coating_type
   Coating_mass       Int
   Chemical_treatment String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 }
 
 model Material_location {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid()) @db.Uuid
   name        String
   code        String
   location    String
@@ -104,17 +223,22 @@ model Material_location {
 }
 
 model Product_name {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
-  type       Product_type
-  dimension  String
-  grade      String
-  coating    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  createdBy  String
-  updatedBy  String
-  ordered    Boolean
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String       @unique
+  type      Product_type
+  grade     String
+  coating   String
+  standard  String
+  delivery  String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  createdBy String
+  updatedBy String
+  ordered   Boolean      @default(false)
+
+  dimensionId    String @db.Uuid
+  dimension      Dimension       @relation(fields: [dimensionId], references: [id])
+  customerOrders CustomerOrder[]
 }
 
 enum Product_type {
@@ -141,47 +265,107 @@ enum Chemical_Treatment {
   Passivation
 }
 
-model example {
-  id Int @id @default(autoincrement())
-  name String
+model CustomerOrder {
+  id                String @id @default(uuid()) @db.Uuid
+  SO                String
+  productName       String
+  productNameId     String? @db.Uuid
+
+  product Product_name? @relation(fields: [productNameId], references: [id])
+
+  productType       Product_type
+  coatingType       Coating_type
+  coatingMass       Int
+  TCT               Float
+  minTCT            Float
+  maxTCT            Float
+  BMT               Float
+  minBMT            Float
+  maxBMT            Float
+  width             Float
+  minWidth          Float
+  maxWidth          Float
+  Grade             String
+  YS                Int
+  minYS             Int
+  maxYS             Int
+  TS                Int
+  minTS             Int
+  maxTS             Int
+  EL                Float
+  minEL             Float
+  maxEL             Float
+  chemicalTreatment Chemical_Treatment
+  minCoilWeight     Int
+  maxCoilWeight     Int
+  totalQuantity     Int
+  export            String
+  deliveryTime      DateTime
+  orderStatus       String
+  orderAt           DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  note              String
+
+  userId String @db.Uuid
+  user   User   @relation("OrderedBy", fields: [userId], references: [id])
+
+  customerDetailId String @db.Uuid
+  customerDetail   CustomerDetail @relation("OrderedBy", fields: [customerDetailId], references: [id])
+
+  approvals CustomerOrderApproval[]
+  history   CustomerOrderHistory[]
 }
 
-model CustomerOrder {
-  id Int @id @default(autoincrement())
-  userId Int
-  SO String
-  productName Int
-  productType Product_type
-  coatingType Coating_type
-  coatingMass Int
-  TCT Float
-  minTCT Float
-  maxTCT Float
-  BMT Float
-  minBMT Float
-  maxBMT Float
-  width Float
-  minWidth Float
-  maxWidth Float
-  Grade String
-  YS Int
-  minYS Int
-  maxYS Int
-  TS Int
-  minTS Int
-  maxTS Int
-  EL Float
-  minEL Float
-  maxEL Float
-  chemicalTreatment Chemical_Treatment
-  customerDetail Int
-  minCoilWeight Int
-  maxCoilWeight Int
-  totalQuantity Int
-  export String
-  deliveryTime DateTime
-  productionStatus String
-  orderAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  note String
+model CustomerOrderHistory {
+  id              String   @id @default(uuid()) @db.Uuid
+  customerOrderId String   @db.Uuid
+  field           String
+  oldValue        String?
+  newValue        String?
+  action          String   @default("UPDATE")
+  changedAt       DateTime @default(now())
+  changedById     String?  @db.Uuid
+  changedByName   String?
+
+  customerOrder CustomerOrder @relation(fields: [customerOrderId], references: [id], onDelete: Cascade)
+  changedBy     User?         @relation("CustomerOrderHistoryChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([customerOrderId, changedAt])
+  @@index([changedById])
+}
+
+model CustomerOrderApproval {
+  id              String         @id @default(uuid()) @db.Uuid
+  customerOrderId String         @db.Uuid
+  department      Department
+  position        Position
+  status          ApprovalStatus @default(PENDING)
+  decidedById     String?        @db.Uuid
+  decidedAt       DateTime?
+  note            String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  customerOrder CustomerOrder @relation(fields: [customerOrderId], references: [id], onDelete: Cascade)
+  decidedBy     User?         @relation("ApprovalDecidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@unique([customerOrderId, department, position])
+  @@index([decidedById])
+}
+
+model CustomerDetail {
+  id             String   @id @default(uuid()) @db.Uuid
+  companyName    String
+  companyAddress String
+  contactPerson  String
+  email          String?
+  phone          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userId String @db.Uuid
+  user   User   @relation("Customer_Detail", fields: [userId], references: [id])
+
+  customer_orders CustomerOrder[] @relation("OrderedBy")
 }

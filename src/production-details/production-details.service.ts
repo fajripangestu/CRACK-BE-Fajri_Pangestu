@@ -5,25 +5,27 @@ import { ProductionDetailsRepository } from './production-details.repository';
 
 @Injectable()
 export class ProductionDetailsService {
-  constructor(private readonly productionDetailsRepository: ProductionDetailsRepository){}
-  
+  constructor(
+    private readonly productionDetailsRepository: ProductionDetailsRepository,
+  ) {}
+
   create(createProductionDetailDto: CreateProductionDetailDto) {
     return 'This action adds a new productionDetail';
   }
 
-  getAllProductionDetails(){
+  getAllProductionDetails() {
     return this.productionDetailsRepository.getAllProductionDetails();
   }
 
-  getOneProductionDetailById(id: number){
+  getOneProductionDetailById(id: string) {
     return this.productionDetailsRepository.getOneProductionDetailById(id);
   }
 
-  update(id: number, updateProductionDetailDto: UpdateProductionDetailDto) {
+  update(id: string, updateProductionDetailDto: UpdateProductionDetailDto) {
     return `This action updates a #${id} productionDetail`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} productionDetail`;
   }
 }

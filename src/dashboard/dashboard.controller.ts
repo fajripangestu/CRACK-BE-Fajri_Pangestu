@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, BadRequestException, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  BadRequestException,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -29,4 +41,3 @@ export class DashboardController {
     return this.dashboardService.getUserData();
   }
 }
-

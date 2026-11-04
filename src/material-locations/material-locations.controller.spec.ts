@@ -11,7 +11,9 @@ describe('MaterialLocationsController', () => {
       providers: [MaterialLocationsService],
     }).compile();
 
-    controller = module.get<MaterialLocationsController>(MaterialLocationsController);
+    controller = module.get<MaterialLocationsController>(
+      MaterialLocationsController,
+    );
   });
 
   it('should be defined', () => {

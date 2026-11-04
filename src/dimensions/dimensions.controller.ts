@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { DimensionsService } from './dimensions.service';
 import { CreateDimensionDto } from './dto/create-dimension.dto';
 import { UpdateDimensionDto } from './dto/update-dimension.dto';
@@ -13,22 +22,25 @@ export class DimensionsController {
   }
 
   @Get()
-  getAllDimensions(){
+  getAllDimensions() {
     return this.dimensionsService.getAllDimensions();
   }
 
   @Get(':id')
-  getOneDimensionById(@Param('id', ParseIntPipe) id: number){
+  getOneDimensionById(@Param('id', ParseUUIDPipe) id: string) {
     return this.dimensionsService.getOneDimensionById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDimensionDto: UpdateDimensionDto) {
-    return this.dimensionsService.update(+id, updateDimensionDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateDimensionDto: UpdateDimensionDto,
+  ) {
+    return this.dimensionsService.update(id, updateDimensionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dimensionsService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.dimensionsService.remove(id);
   }
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { StandardsService } from './standards.service';
 import { CreateStandardDto } from './dto/create-standard.dto';
 import { UpdateStandardDto } from './dto/update-standard.dto';
@@ -8,7 +17,7 @@ export class StandardsController {
   constructor(private readonly standardsService: StandardsService) {}
 
   @Get()
-  getAllStandards(){
+  getAllStandards() {
     return this.standardsService.getAllStandards();
   }
   @Post()
@@ -17,17 +26,20 @@ export class StandardsController {
   }
 
   @Get(':id')
-  getOneStandardById(@Param('id', ParseIntPipe) id: number){
+  getOneStandardById(@Param('id', ParseUUIDPipe) id: string) {
     return this.standardsService.getOneStandardById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStandardDto: UpdateStandardDto) {
-    return this.standardsService.update(+id, updateStandardDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateStandardDto: UpdateStandardDto,
+  ) {
+    return this.standardsService.update(id, updateStandardDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.standardsService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.standardsService.remove(id);
   }
 }

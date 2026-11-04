@@ -11,7 +11,9 @@ describe('CoilRawMaterialsController', () => {
       providers: [CoilRawMaterialsService],
     }).compile();
 
-    controller = module.get<CoilRawMaterialsController>(CoilRawMaterialsController);
+    controller = module.get<CoilRawMaterialsController>(
+      CoilRawMaterialsController,
+    );
   });
 
   it('should be defined', () => {

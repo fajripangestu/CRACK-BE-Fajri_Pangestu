@@ -5,25 +5,27 @@ import { CoilRawMaterialsRepository } from './coil-raw-materials.repository';
 
 @Injectable()
 export class CoilRawMaterialsService {
-  constructor(private readonly coilRawMaterialsRepository: CoilRawMaterialsRepository){}
+  constructor(
+    private readonly coilRawMaterialsRepository: CoilRawMaterialsRepository,
+  ) {}
 
   create(createCoilRawMaterialDto: CreateCoilRawMaterialDto) {
     return 'This action adds a new coilRawMaterial';
   }
 
-  getAllCoilRawMaterials(){
+  getAllCoilRawMaterials() {
     return this.coilRawMaterialsRepository.getAllCoilRawMaterials();
   }
 
-  getOneCoilRawMaterialById(id: number){
+  getOneCoilRawMaterialById(id: string) {
     return this.coilRawMaterialsRepository.getOneCoilRawMaterialById(id);
   }
 
-  update(id: number, updateCoilRawMaterialDto: UpdateCoilRawMaterialDto) {
+  update(id: string, updateCoilRawMaterialDto: UpdateCoilRawMaterialDto) {
     return `This action updates a #${id} coilRawMaterial`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} coilRawMaterial`;
   }
 }
