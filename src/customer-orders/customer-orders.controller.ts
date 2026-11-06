@@ -91,8 +91,68 @@ export class CustomerOrdersController {
         'Status persetujuan harus APPROVED atau REJECTED.',
       );
     }
+  }
+  
+    @Get('ppc')
+    @UseGuards(RolesGuard, DepartmentsGuard)
+    @Roles('ADMIN')
+    @Departments(Department.PPC)
+    findAllForPpc(@Req() req: { user: { userId: string } }) {
+      return this.customerOrdersService.findAllForPpc(req.user.userId);
+    }
 
-    return this.customerOrdersService.updateProductionApproval(
+    @Patch(':id/ppc-approval')
+    @UseGuards(RolesGuard, DepartmentsGuard)
+    @Roles('ADMIN')
+    @Departments(Department.PPC)
+    updatePpcApproval(
+      @Param('id') id: string,
+      @Req() req: { user: { userId: string } },
+      @Body() dto: UpdateOrderApprovalDto,
+    ) {
+      if (
+        dto.status !== ApprovalStatus.APPROVED &&
+        dto.status !== ApprovalStatus.REJECTED
+      ) {
+        throw new BadRequestException(
+          'Status persetujuan harus APPROVED atau REJECTED.',
+        );
+      }
+
+    return this.customerOrdersService.updatePpcApproval(
+      req.user.userId,
+      id,
+      dto,
+    );
+  }
+
+  @Get('procurement')
+  @UseGuards(RolesGuard, DepartmentsGuard)
+  @Roles('ADMIN')
+  @Departments(Department.PROCUREMENT)
+  findAllForProcurement(@Req() req: { user: { userId: string } }) {
+    return this.customerOrdersService.findAllForProcurement(req.user.userId);
+  }
+
+  @Patch(':id/procurement-approval')
+  @UseGuards(RolesGuard, DepartmentsGuard)
+  @Roles('ADMIN')
+  @Departments(Department.PROCUREMENT)
+  updateProcurementApproval(
+    @Param('id') id: string,
+    @Req() req: { user: { userId: string } },
+    @Body() dto: UpdateOrderApprovalDto,
+  ) {
+    if (
+      dto.status !== ApprovalStatus.APPROVED &&
+      dto.status !== ApprovalStatus.REJECTED
+    ) {
+      throw new BadRequestException(
+        'Status persetujuan harus APPROVED atau REJECTED.',
+      );
+    }
+
+    return this.customerOrdersService.updateProcurementApproval(
       req.user.userId,
       id,
       dto,

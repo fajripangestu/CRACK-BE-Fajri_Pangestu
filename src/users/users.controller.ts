@@ -14,6 +14,8 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateOwnProfileDto } from './dto/update-own-profile.dto';
+import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -31,6 +33,44 @@ export class UsersController {
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getOwnProfile(@Req() req: { user: { userId: string } }) {
+    return this.usersService.getOneUserById(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  updateOwnProfile(
+    @Body() updateOwnProfileDto: UpdateOwnProfileDto,
+    @Req() req: { user: { userId: string } },
+  ) {
+    if (
+      updateOwnProfileDto.name === undefined &&
+      updateOwnProfileDto.email === undefined
+    ) {
+      throw new BadRequestException('Tidak ada data yang diubah');
+    }
+
+    return this.usersService.updateUser(
+      req.user.userId,
+      updateOwnProfileDto,
+      req.user.userId,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/password')
+  changeOwnPassword(
+    @Body() changeOwnPasswordDto: ChangeOwnPasswordDto,
+    @Req() req: { user: { userId: string } },
+  ) {
+    return this.usersService.changeOwnPassword(
+      req.user.userId,
+      changeOwnPasswordDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -60,7 +100,13 @@ export class UsersController {
   ) {
     const modifierId = req.user.userId;
 
-    if (!updateUserDto.name && !updateUserDto.email && !updateUserDto.role && !updateUserDto.department && !updateUserDto.position) {
+    if (
+      !updateUserDto.name &&
+      !updateUserDto.email &&
+      !updateUserDto.role &&
+      !updateUserDto.department &&
+      !updateUserDto.position
+    ) {
       throw new BadRequestException('Tidak ada data yang diubah');
     }
 

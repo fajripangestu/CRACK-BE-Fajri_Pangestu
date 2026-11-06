@@ -1,14 +1,15 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { Role } from 'generated/prisma/enums';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { Prisma } from 'generated/prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersRepository {
@@ -42,7 +43,7 @@ export class UsersRepository {
         email: true,
         role: true,
         department: true,
-        position:true,
+        position: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -54,7 +55,7 @@ export class UsersRepository {
     if (!user) throw new NotFoundException('User tidak ditemukan');
 
     // Hanya field yang benar-benar berubah
-    const fields = ['name', 'email', 'role', 'department','position'] as const;
+    const fields = ['name', 'email', 'role', 'department', 'position'] as const;
     const changed = fields.filter(
       (f) => dto[f] !== undefined && dto[f] !== user[f],
     );
@@ -72,9 +73,7 @@ export class UsersRepository {
           this.prisma.userHistory.create({
             data: {
               userId: id,
-              userName: changed.includes('name')
-                ? String(dto.name)
-                : user.name,
+              userName: changed.includes('name') ? String(dto.name) : user.name,
               field: f,
               oldValue: String(user[f]),
               newValue: String(dto[f]),
@@ -95,6 +94,40 @@ export class UsersRepository {
       }
       throw e;
     }
+  }
+
+  async changeOwnPassword(userId: string, dto: ChangeOwnPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, password: true, isActive: true },
+    });
+    if (!user || !user.isActive) {
+      throw new NotFoundException('User tidak ditemukan');
+    }
+
+    if (!(await bcrypt.compare(dto.currentPassword, user.password))) {
+      throw new UnauthorizedException('Password saat ini salah');
+    }
+
+    const password = await bcrypt.hash(dto.newPassword, 10);
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { password },
+      }),
+      this.prisma.userHistory.create({
+        data: {
+          userId,
+          userName: user.name,
+          field: 'password',
+          action: 'EDIT',
+          status: user.isActive,
+          changedBy: userId,
+        },
+      }),
+    ]);
+
+    return { message: 'Password berhasil diperbarui' };
   }
 
   async createUser(data: CreateUserDto, modifierId: string) {

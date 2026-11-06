@@ -18,6 +18,14 @@ async function main() {
     'productionmanager123',
     10,
   );
+  const ppcManagerPasswordHash = await bcrypt.hash(
+    'ppcmanager123',
+    10,
+  );
+  const procurementManagerPasswordHash = await bcrypt.hash(
+    'procurementmanager123',
+    10,
+  );
 
   const users = [
     {
@@ -29,17 +37,17 @@ async function main() {
       position: 'MANAGER',
     },
     {
-      email: 'admin1@example.com',
+      email: 'productionadmin@example.com',
       password: passwordHash2,
-      name: 'Admin 1',
+      name: 'Production Admin',
       role: 'ADMIN',
       department: 'PRODUCTION',
       position: 'ADMINISTRATIVE_STAFF',
     },
     {
-      email: 'admin4@example.com',
+      email: 'salesadmin@example.com',
       password: passwordHash2,
-      name: 'Admin Sales',
+      name: 'Sales Admin',
       role: 'ADMIN',
       department: 'SALES',
       position: 'ADMINISTRATIVE_STAFF',
@@ -61,20 +69,60 @@ async function main() {
       position: 'MANAGER',
     },
     {
-      email: 'user1@example.com',
+      email: 'customer1@example.com',
       password: passwordHash3,
-      name: 'User 1',
+      name: 'Customer 1',
       role: 'USER',
       department: 'CUSTOMER',
       position: 'CUSTOMER',
     },
+    {
+      email: 'customer2@example.com',
+      password: passwordHash3,
+      name: 'Customer 2',
+      role: 'USER',
+      department: 'CUSTOMER',
+      position: 'CUSTOMER',
+    },
+    {
+      email: 'ppcmanager@example.com',
+      password: ppcManagerPasswordHash,
+      name: 'PPC Manager',
+      role: 'ADMIN',
+      department: 'PPC',
+      position: 'MANAGER',
+    },
+    {
+      email: 'procurementmanager@example.com',
+      password: procurementManagerPasswordHash,
+      name: 'Procurement Manager',
+      role: 'ADMIN',
+      department: 'PROCUREMENT',
+      position: 'MANAGER',
+    },
   ] as const;
 
+  const legacyEmails: Record<string, string[]> = {
+    'productionadmin@example.com': ['admin1@example.com'],
+    'salesadmin@example.com': ['admin4@example.com'],
+    'customer1@example.com': ['user1@example.com'],
+    'customer2@example.com': ['user2@example.com'],
+    'ppcmanager@example.com': ['admin5@example.com'],
+  };
+
   for (const user of users) {
-    const existingUser = await prisma.user.findFirst({
+    let existingUser = await prisma.user.findFirst({
       where: { email: { equals: user.email, mode: 'insensitive' } },
       select: { id: true },
     });
+
+    for (const legacyEmail of legacyEmails[user.email] ?? []) {
+      if (existingUser) break;
+      existingUser = await prisma.user.findFirst({
+        where: { email: { equals: legacyEmail, mode: 'insensitive' } },
+        select: { id: true },
+      });
+    }
 
     if (existingUser) {
       await prisma.user.update({

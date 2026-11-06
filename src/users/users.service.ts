@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -34,6 +35,10 @@ export class UsersService {
       position: updated.position,
       updatedAt: updated.updatedAt,
     };
+  }
+
+  changeOwnPassword(userId: string, dto: ChangeOwnPasswordDto) {
+    return this.usersRepository.changeOwnPassword(userId, dto);
   }
 
   // 🔹 Create user baru

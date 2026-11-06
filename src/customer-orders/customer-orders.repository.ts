@@ -12,6 +12,16 @@ import { UpdateOrderApprovalDto } from './dto/update-order-approval.dto';
 
 const CANCELLABLE_ORDER_STATUSES = ['Pengajuan penawaran', 'Jawaban penawaran'];
 
+function historyValue(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return JSON.stringify(value) ?? null;
+}
+
 async function generateQoNumber(
   tx: Prisma.TransactionClient,
   destination: string,
@@ -119,6 +129,14 @@ export class CustomerOrdersRepository {
     return this.findAllForDepartment(userId, Department.PRODUCTION);
   }
 
+  async findAllForPpc(userId: string) {
+    return this.findAllForDepartment(userId, Department.PPC);
+  }
+
+  async findAllForProcurement(userId: string) {
+    return this.findAllForDepartment(userId, Department.PROCUREMENT);
+  }
+
   private async findAllForDepartment(userId: string, department: Department) {
     const position = await this.getDepartmentPosition(userId, department);
     const activeOrders = await this.prisma.customerOrder.findMany({
@@ -165,13 +183,13 @@ export class CustomerOrdersRepository {
         minEL: true,
         maxEL: true,
         chemicalTreatment: true,
-        ...(department === Department.PRODUCTION
-          ? { minCoilWeight: true, maxCoilWeight: true }
-          : {}),
+        minCoilWeight: true,
+        maxCoilWeight: true,
         totalQuantity: true,
         export: true,
         orderStatus: true,
         orderAt: true,
+        updatedAt: true,
         deliveryTime: true,
         note: true,
         customerDetail: { select: { companyName: true } },
@@ -212,6 +230,32 @@ export class CustomerOrdersRepository {
       id,
       data,
       Department.PRODUCTION,
+    );
+  }
+
+  async updatePpcApproval(
+    userId: string,
+    id: string,
+    data: UpdateOrderApprovalDto,
+  ) {
+    return this.updateDepartmentApproval(
+      userId,
+      id,
+      data,
+      Department.PPC,
+    );
+  }
+
+  async updateProcurementApproval(
+    userId: string,
+    id: string,
+    data: UpdateOrderApprovalDto,
+  ) {
+    return this.updateDepartmentApproval(
+      userId,
+      id,
+      data,
+      Department.PROCUREMENT,
     );
   }
 
@@ -350,7 +394,41 @@ export class CustomerOrdersRepository {
     return this.prisma.$transaction(async (tx) => {
       const currentOrder = await tx.customerOrder.findFirst({
         where: { id, userId },
-        select: { id: true, orderStatus: true },
+        select: {
+          id: true,
+          orderStatus: true,
+          customerDetailId: true,
+          productName: true,
+          productType: true,
+          coatingType: true,
+          coatingMass: true,
+          TCT: true,
+          minTCT: true,
+          maxTCT: true,
+          BMT: true,
+          minBMT: true,
+          maxBMT: true,
+          width: true,
+          minWidth: true,
+          maxWidth: true,
+          Grade: true,
+          YS: true,
+          minYS: true,
+          maxYS: true,
+          TS: true,
+          minTS: true,
+          maxTS: true,
+          EL: true,
+          minEL: true,
+          maxEL: true,
+          chemicalTreatment: true,
+          minCoilWeight: true,
+          maxCoilWeight: true,
+          totalQuantity: true,
+          export: true,
+          deliveryTime: true,
+          note: true,
+        },
       });
       if (!currentOrder) return null;
       if (!CANCELLABLE_ORDER_STATUSES.includes(currentOrder.orderStatus)) {
@@ -370,56 +448,83 @@ export class CustomerOrdersRepository {
         throw new NotFoundException('Alamat pengiriman tidak ditemukan.');
       }
 
+      const updatedValues = {
+        customerDetailId: customerDetail.id,
+        productName: [
+          `${data.BMT} mm`,
+          `${data.width} mm`,
+          data.Grade.trim(),
+          `${data.coatingMass} g/m²`,
+          data.chemicalTreatment,
+        ].join(' x '),
+        productType: data.productType,
+        coatingType: data.coatingType,
+        coatingMass: data.coatingMass,
+        TCT: data.TCT,
+        minTCT: data.minTCT,
+        maxTCT: data.maxTCT,
+        BMT: data.BMT,
+        minBMT: data.minBMT,
+        maxBMT: data.maxBMT,
+        width: data.width,
+        minWidth: data.minWidth,
+        maxWidth: data.maxWidth,
+        Grade: data.Grade,
+        YS: data.YS,
+        minYS: data.minYS,
+        maxYS: data.maxYS,
+        TS: data.TS,
+        minTS: data.minTS,
+        maxTS: data.maxTS,
+        EL: data.EL,
+        minEL: data.minEL,
+        maxEL: data.maxEL,
+        chemicalTreatment: data.chemicalTreatment,
+        minCoilWeight: data.minCoilWeight,
+        maxCoilWeight: data.maxCoilWeight,
+        totalQuantity: data.totalQuantity,
+        export: data.export,
+        deliveryTime: new Date(data.deliveryTime),
+        note: data.note,
+      };
+
       const updated = await tx.customerOrder.updateMany({
         where: {
           id,
           userId,
           orderStatus: { in: CANCELLABLE_ORDER_STATUSES },
         },
-        data: {
-          customerDetailId: customerDetail.id,
-          productName: [
-            `${data.BMT} mm`,
-            `${data.width} mm`,
-            data.Grade.trim(),
-            `${data.coatingMass} g/m²`,
-            data.chemicalTreatment,
-          ].join(' x '),
-          productType: data.productType,
-          coatingType: data.coatingType,
-          coatingMass: data.coatingMass,
-          TCT: data.TCT,
-          minTCT: data.minTCT,
-          maxTCT: data.maxTCT,
-          BMT: data.BMT,
-          minBMT: data.minBMT,
-          maxBMT: data.maxBMT,
-          width: data.width,
-          minWidth: data.minWidth,
-          maxWidth: data.maxWidth,
-          Grade: data.Grade,
-          YS: data.YS,
-          minYS: data.minYS,
-          maxYS: data.maxYS,
-          TS: data.TS,
-          minTS: data.minTS,
-          maxTS: data.maxTS,
-          EL: data.EL,
-          minEL: data.minEL,
-          maxEL: data.maxEL,
-          chemicalTreatment: data.chemicalTreatment,
-          minCoilWeight: data.minCoilWeight,
-          maxCoilWeight: data.maxCoilWeight,
-          totalQuantity: data.totalQuantity,
-          export: data.export,
-          deliveryTime: new Date(data.deliveryTime),
-          note: data.note,
-        },
+        data: updatedValues,
       });
       if (updated.count === 0) {
         throw new ConflictException(
           'Penawaran tidak dapat diedit setelah masuk tahap produksi.',
         );
+      }
+
+      const changes: Array<{
+        field: string;
+        oldValue: string | null;
+        newValue: string | null;
+      }> = (Object.keys(updatedValues) as Array<keyof typeof updatedValues>)
+        .map((field) => ({
+          field,
+          oldValue: historyValue(currentOrder[field]),
+          newValue: historyValue(updatedValues[field]),
+        }))
+        .filter((change) => change.oldValue !== change.newValue);
+
+      if (changes.length > 0) {
+        await tx.customerOrderHistory.createMany({
+          data: changes.map((change) => ({
+            customerOrderId: id,
+            field: change.field,
+            oldValue: change.oldValue,
+            newValue: change.newValue,
+            action: 'UPDATE',
+            changedById: userId,
+          })),
+        });
       }
 
       return tx.customerOrder.findFirst({

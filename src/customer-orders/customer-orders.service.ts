@@ -37,6 +37,38 @@ export class CustomerOrdersService {
     );
   }
 
+  findAllForPpc(userId: string) {
+    return this.customerOrderRepository.findAllForPpc(userId);
+  }
+
+  updatePpcApproval(
+    userId: string,
+    id: string,
+    data: UpdateOrderApprovalDto,
+  ) {
+    return this.customerOrderRepository.updatePpcApproval(
+      userId,
+      id,
+      data,
+    );
+  }
+
+  findAllForProcurement(userId: string) {
+    return this.customerOrderRepository.findAllForProcurement(userId);
+  }
+
+  updateProcurementApproval(
+    userId: string,
+    id: string,
+    data: UpdateOrderApprovalDto,
+  ) {
+    return this.customerOrderRepository.updateProcurementApproval(
+      userId,
+      id,
+      data,
+    );
+  }
+
   findAllForUser(userId: string) {
     return this.customerOrderRepository.findAllForUser(userId);
   }
