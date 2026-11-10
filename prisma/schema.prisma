@@ -32,6 +32,38 @@ model User {
   customer_details CustomerDetail[] @relation("Customer_Detail")
   approvalDecisions CustomerOrderApproval[] @relation("ApprovalDecidedBy")
   customerOrderHistoryChanges CustomerOrderHistory[] @relation("CustomerOrderHistoryChangedBy")
+  activityLogs      ActivityLog[]            @relation("ActivityLogActor")
+}
+
+model ActivityLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String?  @db.Uuid
+  action       String
+  module       String?
+  description  String?
+  entityType   String?
+  entityId     String?  @db.Uuid
+  method       String?
+  endpoint     String?
+  referer      String?
+  statusCode   Int?
+  ipAddress    String?
+  userAgent    String?
+  browser      String?
+  os           String?
+  deviceType   String?
+  language     String?
+  timezone     String?
+  screenWidth  Int?
+  screenHeight Int?
+  createdAt    DateTime @default(now())
+
+  user User? @relation("ActivityLogActor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("activity_logs")
 }
 
 model UserHistory {

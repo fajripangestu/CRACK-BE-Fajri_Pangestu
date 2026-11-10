@@ -1,18 +1,17 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   HttpCode,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { Throttle } from '@nestjs/throttler';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -32,7 +31,14 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @HttpCode(200)
   @Post('login')
-  login(@Body() credentials: LoginDto) {
-    return this.authService.login(credentials);
+  login(@Body() credentials: LoginDto, @Req() request: Request) {
+    return this.authService.login(credentials, request);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('logout')
+  logout(@Req() request: Request & { user: { userId: string } }) {
+    return this.authService.logout(request.user.userId, request);
   }
 }

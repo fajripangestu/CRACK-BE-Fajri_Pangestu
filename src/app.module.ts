@@ -22,6 +22,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ConfigModule } from '@nestjs/config';
 import { CustomerOrdersModule } from './customer-orders/customer-orders.module';
 import { CustomerDetailsModule } from './customer-details/customer-details.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { CustomerDetailsModule } from './customer-details/customer-details.modul
     DashboardModule,
     CustomerOrdersModule,
     CustomerDetailsModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
